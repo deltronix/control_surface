@@ -42,6 +42,17 @@ impl<I: InputPin, const FILTER_SIZE: usize> Switch<I, FILTER_SIZE> {
         &mut self.pin_sw
     }
 
+    /// Returns the internal state of the Switch, if it is held down returns true
+    #[inline]
+    pub fn is_pressed(&self) -> bool {
+        self.state
+    }
+    /// Returns the internal state of the Switch, if it is released returns true
+    #[inline]
+    pub fn is_released(&self) -> bool {
+        !self.state
+    }
+
     /// Call periodically to read switch pin and update state, returns Some(SwitchState) if a state
     /// change was detected, else returns None.
     pub fn poll(&mut self) -> Option<SwitchEvent> {
