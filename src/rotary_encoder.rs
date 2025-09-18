@@ -1,5 +1,8 @@
 use embedded_hal::digital::InputPin;
 use heapless::Vec;
+pub enum EncoderEvent {
+    Ticks(usize, i32),
+}
 
 /// Time driver agnostic velocity mapping for a RotaryEncoder.
 pub struct EncoderVelocityMap<const MAP_SIZE: usize> {
@@ -31,7 +34,7 @@ impl<const MAP_SIZE: usize> EncoderVelocityMap<MAP_SIZE> {
             Err(_) => panic!("No space for velocity map"),
         }
     }
-    pub fn map(&mut self, instant: u64, ticks: Option<i32>) -> Option<i32> {
+    pub fn process(&mut self, instant: u64, ticks: Option<i32>) -> Option<i32> {
         match ticks {
             Some(ticks) => {
                 if self.map.is_empty() {
@@ -58,10 +61,6 @@ impl<const MAP_SIZE: usize> EncoderVelocityMap<MAP_SIZE> {
             None => None,
         }
     }
-}
-
-pub enum EncoderEvent {
-    Ticks(usize, i32),
 }
 
 pub struct RotaryEncoder<I: InputPin, const FILTER_SIZE: usize> {

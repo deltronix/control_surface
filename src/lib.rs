@@ -5,7 +5,6 @@ use embedded_hal::digital::InputPin;
 
 use crate::rotary_encoder::RotaryEncoder;
 pub mod button;
-pub mod fader;
 pub mod rotary_encoder;
 
 #[cfg(feature = "midi")]
