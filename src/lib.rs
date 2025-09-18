@@ -50,12 +50,12 @@ mod tests {
             .with((100_000, 8.0));
 
         let mut inst = 0;
-        assert_eq!(map.map(inst, Some(1)), Some(1));
+        assert_eq!(map.process(inst, Some(1)), Some(1));
         inst += 300_000;
-        assert_eq!(map.map(inst, Some(1)), Some(2));
+        assert_eq!(map.process(inst, Some(1)), Some(2));
         inst += 400_000;
-        assert_eq!(map.map(inst, Some(-1)), Some(-2));
+        assert_eq!(map.process(inst, Some(-1)), Some(-2));
         inst += 90_000;
-        assert_eq!(map.map(inst, Some(-1)), Some(-8));
+        assert_eq!(map.process(inst, Some(-1)), Some(-8));
     }
 }
