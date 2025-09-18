@@ -1,15 +1,42 @@
 #![no_std]
+
+//! A library
+use embedded_hal::digital::InputPin;
+
+use crate::rotary_encoder::RotaryEncoder;
+pub mod button;
+pub mod fader;
 pub mod rotary_encoder;
-pub mod switch;
+
+#[cfg(feature = "midi")]
+pub mod midi;
 
 pub enum UiEvent {
+    Fader,
     RotaryEncoder(usize, i32),
-    Switch(usize, switch::SwitchEvent),
+    Button(usize, button::ButtonState),
 }
+
+pub struct Bank<S: SurfaceElement, const N: usize> {
+    elements: [S; N],
+}
+
+type RotaryEncoderBank = Bank<RotaryEncoder<dyn InputPin<Error = ()>, 4>, 4>;
+
+pub trait SurfaceElement {
+    type Input;
+    type Feedback;
+    type Output;
+
+    fn set_get(&mut self, value: Self::Input) -> Option<Self::Output>;
+    fn feedback(&mut self, value: Self::Feedback);
+}
+
 pub trait ControlSurface {
     type SurfaceEvent;
     fn update(&mut self) -> Option<Self::SurfaceEvent>;
 }
+
 #[cfg(test)]
 mod tests {
     use crate::rotary_encoder::EncoderVelocityMap;
