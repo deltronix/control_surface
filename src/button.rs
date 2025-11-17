@@ -45,7 +45,7 @@ pub struct DebouncedButton<I, const FILTER_SIZE: usize> {
 /// Switch with a predefined debounce filter size should be between 2 and 8
 impl<I, const FILTER_SIZE: usize> DebouncedButton<I, FILTER_SIZE>
 where
-    I: Into<bool>,
+    I: InputPin,
 {
     pub fn new(pin_sw: I, pull_up: bool) -> Self {
         let mut mask: u8 = 0;
@@ -64,13 +64,6 @@ where
         }
     }
 
-    pub fn get_pin(&mut self) -> &mut I
-    where
-        I: Wait,
-    {
-        &mut self.pin_sw
-    }
-
     /// Returns the internal state of the Switch, if it is held down returns true
     #[inline]
     pub fn is_pressed(&self) -> bool {
@@ -84,11 +77,11 @@ where
 
     /// Call periodically to read switch pin and update state, returns Some(SwitchState) if a state
     /// change was detected, else returns None.
-    pub fn debounce(&mut self, input: I) -> Option<ButtonState> {
+    pub fn debounce(&mut self) -> Option<ButtonState> {
         let sw = match self.pull_up {
             // TODO: reimplement
-            true => !input.into(),
-            false => input.into(),
+            true => self.pin_sw.is_low().unwrap(),
+            false => self.pin_sw.is_high().unwrap(),
         };
 
         if sw {
@@ -113,16 +106,14 @@ where
     }
 }
 
-impl<I> SurfaceElement for DebouncedButton<I, 4>
-where
-    I: Into<bool>,
-{
-    type Input = I;
-    type Feedback = ();
-    type Output = ButtonState;
-
-    fn set_get(&mut self, value: Self::Input) -> Option<Self::Output> {
-        self.debounce(value)
-    }
-    fn feedback(&mut self, value: Self::Feedback) {}
-}
+// impl<I> SurfaceElement for DebouncedButton<I, 4>
+// where
+//     I: Into<bool>,
+// {
+//     type Input = I;
+//     type Feedback = ();
+//     type Output = ButtonState;
+//
+//     fn set_get(&mut self, value: Self::Input) -> Option<Self::Output> {}
+//     fn feedback(&mut self, value: Self::Feedback) {}
+// }
